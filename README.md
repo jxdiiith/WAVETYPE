@@ -1,9 +1,7 @@
-# WAVETYPE_V1
-WAVETYPE is a tool to create patterns out of typography
 <h1> WAVETYPE </h1> 
 				<small> Version 1 </small> <br>
 				<small> &#xA9; <a href= "https://judithhoefliger.cargo.site/" target="_blank">judithhoefliger.cargo.site</a></small> <br>  <p> 
-				<p>  with this tool you can make some nice patterns out of typography  <p>
+				<p> WAVETYPE is a tool to create patterns out of typography <p>
 				<p> <h2> some quick Informations </h2> <p> 
 				- you always need to select your text in order to make changes to it, also if you want to use the random button <br> 
 				- you can select it when you klick on the first letter on the word <br>  
