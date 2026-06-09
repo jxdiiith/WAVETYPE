@@ -12,4 +12,4 @@
 				<h2> tools used </h2>
 				<p> <a href="https://seb-prjcts-be.github.io/p5.waves/index.html" target="_blank">p5.Waves</a>, movements for text
 				<p> <a href="https://github.com/ffd8/p5live" target="_blank">P5LIVE</a>, used in beginning stage <p> <br>
-				<p> (to close this window you can klick again on "About")
+				<p> 
