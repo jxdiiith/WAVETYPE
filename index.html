@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>type text + colorPicker + slider</title>
+	<meta charset="utf-8">
+	<!-- Compiled w/ P5LIVE, http://github.com/ffd8/p5live -->
+	<style type="text/css">
+		body{
+			margin:0;
+			overflow:hidden;
+			font-family: "Open Sans", sans-serif;
+			font-optical-sizing: auto;
+			
+
+		}
+		canvas{
+			position:fixed;
+			top:0;
+			left:0;
+			z-index:-1;
+			width:100vw;
+			height:100vh;
+			margin:0;
+		}
+		.guiHolder{ 
+     		position: fixed; 
+			width: 200px;
+      		left: 10px; 
+      		top: 10px; 
+			bottom: 10px;
+      		border-radius: 8px; 
+			background:rgb(19, 13, 30);
+      		padding: 15px; 
+		} 
+		
+		.guiHolder button{
+			color: white;
+			background-color: rgb(168, 117, 255);
+			border: none;
+			padding: 5px 12px;
+			margin-bottom: 5px;
+			border-radius: 8px;
+		}
+		
+		.buttoningui{
+			display: flex;
+			gap: 5px;
+			width: 170px;
+		}
+
+		.about{
+			position: fixed; 
+			width: 50%;
+      		height: 50%; 
+      		top: 25%; 
+			left: 25%;
+			transform: transalte(-50%, 50%);
+			background:rgb(168, 117, 255);
+      		padding: 24px; 
+			box-sizing: border-box;
+			color: white;
+			overflow-y: auto;
+			border-radius: 8px;
+		}
+
+		.about h1{
+			font-size: 28px;
+			margin-bottom: 18px;
+			padding-bottom: 0px;
+			font-weight: 800;
+		}
+
+		 .about h2{
+			font-size: 18px;
+			margin: 0px;
+			padding-bottom: 0px;
+			font-weight: 680;
+			margin: 24px 0 5px 0;
+			  
+		}
+
+		.about small{
+			font-size: 12px;
+			margin-bottom: 24px;
+			padding-bottom: 0px;
+			
+		}
+
+		.about p {
+			font-size: 15px;
+			line-height: 1.3;
+			margin: 0 0 12px 0;
+		}
+
+		.about a{
+			color: white;
+   			text-decoration: underline;
+   			pointer-events: all;  /* sicherstellen dass klicks ankommen */
+		}
+
+
+		.buttonsRight {
+   			position: fixed;
+   			top: 10px;
+   		 	right: 20px;
+   		 	display: flex;
+			flex-direction: column;
+    		gap: 5px;
+			}
+
+		.buttonsRight button {
+    		color: white;
+   		 	background-color: rgb(168, 117, 255);
+   			 border: none;
+   			 padding: 5px 12px;
+   			 border-radius: 8px;
+			}
+
+		.label{ 
+      		color:#fff; 
+      		font-family:sans-serif; 
+      		font-size:10pt; 
+      		font-weight:bold; 
+      		padding:5px; 
+			padding-bottom: 0px;
+			margin-bottom: 0px;
+			width: 170px;
+   		 } 
+
+		 .label h2{
+			margin: 0px;
+			padding-bottom: 10px;
+		}
+
+		.input{
+			width: 192px; 
+			margin-top: 10px;
+			margin-bottom: 10px;
+			width: 170px;
+		}
+
+		.textInput{
+			border-radius: 8px;
+  			padding: 3px;
+  			border: none;
+			margin-bottom: 3px;
+			width: 170px;
+		}
+
+		.textnextto{
+			color:#fff; 
+      		font-family:sans-serif; 
+      		font-size:9.5pt;  
+      		padding:4px;
+			white-space: nowrap;
+			margin-top: 3px;
+		}
+		.slider{
+			width: 200px;; 
+			margin-bottom: 10px;
+			accent-color: rgb(168, 117, 255);
+			width:170px;
+		}
+		.select{ 
+			border: none;
+			padding: 3px 0px;
+			border-radius: 8px;
+			margin-bottom: 10px;
+			width:170px;
+		}
+		
+		.picker{
+			margin-bottom: 10px;
+			border-radius: 8px;
+			width:170px;
+		}
+
+
+	</style>
+	<script type="text/javascript">
+		// eco-mode = only render if window focused
+		window.onblur = function () {
+			noLoop();
+		};
+		window.onfocus = function () {
+			loop();
+		};
+	</script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/p5@1/lib/p5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/seb-prjcts-be/p5.waves@v3.2.0/p5.waves.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/p5.capture@1.6.1/dist/p5.capture.umd.min.js"></script>
+</head>
+<body style="background: rgb(0, 0, 0);">
+
+<script type="text/javascript">
+//type text + colorPicker + slider
+
+/* CUSTOM FUNCTIONS FOR P5LIVE */
+// keep fullscreen if window resized
+function windowResized() {
+	resizeCanvas(windowWidth, windowHeight);
+}
+
+// custom ease function
+function ease(iVal, oVal, eVal){
+	return oVal += (iVal - oVal) * eVal;
+}
+
+// processing compatibility
+function println(msg){
+	print(msg);
+}
+
+let motionX = 0, motionY = 0
+
+let boxes = []
+let color1 = [150, 20, 255] //purple
+let color2 = [140, 200, 180] //türkis
+
+let guiHolder
+
+let txt = ""
+let textInputSlider
+let colorPicker
+let rowNumb
+let amplitudeSlider
+let speedSlider
+let textsizeslider
+let strokeWeightSlider
+let colorPickerStroke
+let lenghtrowslider
+let sizerowslider
+
+let WavetypeSelect
+let waveOptions = ['mountain peaks','saw down', 'noise', 'bumpy sine','sine', 'smooth solid sine', 'wobble sine', 'meta sine', 'fuzzy peak sine', 'half sine', 'triangle sine'] //diffrent waves form p5.wave
+let currentWave = 'mountain peaks' //default 
+//let directionOptions = [2, 1,-1,0,-0.5, 1.5, -1.5]
+//let directionOptions = [0, 85, -85, 45, -45, 150, -150]
+
+let selectedRow = 0 
+
+/*P5Capture.setDefaultOptions({
+  format: "mp4",
+  framerate: 60,
+  quality: 1,
+});*/
+
+function setup() {
+	createCanvas(windowWidth, windowHeight)
+	//x,y,w,h,color,speed,direction,animation,label,
+
+	guiHolder = createDiv()
+		.class('guiHolder')
+//titel GUI
+	createDiv('<h2> WAVETYPE <br>')
+		.parent(guiHolder)
+		.class('label')
+
+myAbout = createDiv(`
+				<h1> WAVETYPE </h1> 
+				<small> Version 1 </small> <br>
+				<small> &#xA9; <a href= "https://judithhoefliger.cargo.site/" target="_blank">judithhoefliger.cargo.site</a></small> <br>  <p> 
+				<p>  with this tool you can make some nice patterns out of typography  <p>
+				<p> <h2> some quick Informations </h2> <p> 
+				- you always need to select your text in order to make changes to it, also if you want to use the random button <br> 
+				- you can select it when you klick on the first letter on the word <br>  
+				- as a said info, you need a really high number in order to change the direction(angle input) <br>
+				- just to say, unfortunately you can't export your visuals as a gift or video because the quality of the export will be really bad, try to do a screen recording, hopefully I'll find a solution for it in a future version  <br> 
+				- and be careful if you do a lot of long rows -> performance issue incoming <p>
+				<p> now have fun making some patters! <p>
+				<h2> tools used </h2>
+				<p> <a href="https://seb-prjcts-be.github.io/p5.waves/index.html" target="_blank">p5.Waves</a>, movements for text
+				<p> <a href="https://github.com/ffd8/p5live" target="_blank">P5LIVE</a>, used in beginning stage <p> <br>
+				<p> (to close this window you can klick again on "About")
+
+				
+				`)
+			.parent(guiHolder)
+			.class('about')
+			.hide()
+
+let buttoningui = createDiv()
+	.parent(guiHolder)
+	.class('buttoningui')
+
+	
+createButton('Add')
+	.parent(buttoningui)
+	.class('input')
+	.mousePressed(function(){
+        let newBox = new TextBox(windowWidth/2, windowHeight/2, 350, 350, color1, 2, 'horizontal', 'sinus', 'Wave')
+		boxes.push(newBox)
+        activeBox = newBox
+    })
+
+	
+createButton('Delete')
+	.parent(buttoningui)
+	.class('input')
+	.mousePressed(function(){
+       if(activeBox && activeBox.hasOwnProperty("rows") && activeBox.rows.length > 0){
+			activeBox.rows.splice(activeBox.activeRow, 1)
+	   }
+    })
+
+let buttonsRight = createDiv()
+	.class('buttonsRight')
+
+createButton('About')
+	.parent(buttonsRight)
+	.mousePressed(function(){
+		if(myAbout.style('display') == 'none'){
+			myAbout.show()
+		}else{
+			myAbout.hide()
+		}
+	   })
+
+createButton('PNG')
+	.parent(buttonsRight)
+	.mousePressed(function(){
+		saveCanvas("Wavetype-pattern", 'png',{
+		})
+	})
+
+
+
+createButton('Random')
+	.parent(buttoningui)
+	.class('input')
+	.mousePressed(function(){
+       if(activeBox){
+			for(let row of activeBox.rows){
+				row.color = color(random(255), random(255), random(255))
+                row.strokecolor = color(random(255), random(255), random(255))
+                row.amplitude = random(1, 100)
+                row.speed = random(0, 10)
+                row.textsize = random(1, 500)
+                row.direction = random(-90000, 90000)
+                row.lengthrow = random(0, 500)
+                row.strokeweight = random(0.25, 20)
+                row.sizerow = random(1, 300)
+                row.waveType = waveOptions[floor(random(waveOptions.length))]
+				let words = ['wave', 'sssss', 'hello', 'slayyyy', 'fjksafjlsk', 'randomnessss']
+				row.label = words[floor(random(words.length))]
+			}
+	   }
+    })
+
+//textinput
+	createDiv('text')
+		.parent(guiHolder)
+		.class('textnextto')
+
+	textInputSlider = createInput(txt) //create text input
+		.parent(guiHolder)
+		.class('textInput')
+		//fire this event on change
+	textInputSlider.input(function(e){ 
+		
+		txt = this.value()
+		//boxes[boxes.length-1].label = txt
+		for(let box of boxes){
+			if(box.active){
+				for(let row of activeBox.rows){ //changing all rows in active box
+					row.label = txt
+				}
+				//activeBox.rows[activeBox.activeRow].label = txt
+				//box.rows[box.activeRow].label = txt
+				//box.label = txt
+			}
+		}
+		e.preventDefault()
+	})
+	
+//dropdown wavetype
+createDiv('wavetype')
+		.parent(guiHolder)
+		.class('textnextto')
+	WavetypeSelect = createSelect() //create dropdown
+		.parent(guiHolder)
+		.class('select')
+	for(let w of waveOptions){ //cycling the array to add options
+		WavetypeSelect.option(w)
+	}
+	WavetypeSelect.selected(currentWave) //starting point/default
+	WavetypeSelect.changed(function(){
+		currentWave = this.value()
+		//boxes[boxes.length-1].waveType = currentWave //grap the latest thing from array i think?
+		for(let box of boxes){
+			if(box.active){
+				for(let row of activeBox.rows){
+					row.waveType = this.value()
+				}
+				//activeBox.rows[activeBox.activeRow].waveType = this.value()
+				//box.rows[box.activeRow].waveType = this.value()
+				//box.waveType = currentWave
+			}
+		}
+	})
+
+//colorpicker
+createDiv('color text')
+		.parent(guiHolder)
+		.class('textnextto')
+	colorPicker = createColorPicker('#A875FF')
+		.parent(guiHolder)
+		.class('picker')
+	colorPicker.input(function(){
+		//for(let box of boxes){ //goes trough every box
+			//if(box.active){ //only edit acitve box
+
+			if(activeBox){ //only edit acitve box
+			for(let row of activeBox.rows){ //goes through every row in activeBox and changes them
+				row.color = this.color()
+			}
+			//activeBox.rows[activeBox.activeRow].color = this.color() //takes bestimmte row and takes color from colorpicker und höt nur 1 row gändert
+
+			//box.rows[box.activeRow].color = this.color() //takes bestimmte row and takes color from colorpicker
+			}
+		//}
+	})
+
+	//colorPickerStroke
+	createDiv('color stroke')
+		.parent(guiHolder)
+		.class('textnextto')
+	colorPickerStroke = createColorPicker('#FFFFFF')
+		.parent(guiHolder)
+		.class('picker')
+	colorPickerStroke.input(function(){
+			if(activeBox){ //only edit acitve box
+			for(let row of activeBox.rows){ //goes through every row in activeBox and changes them
+				row.strokecolor = this.color()
+			}
+			}
+		//}
+	})
+
+	//slider für strokeWeight
+createDiv('stroke Weight')
+	.parent(guiHolder)
+	.class('textnextto')
+strokeWeightSlider = createSlider(0.25,20,1,1)
+	.parent(guiHolder)
+	.class('slider')
+strokeWeightSlider.input(function(){
+	for(let box of boxes){
+		if(box.active){
+			for(let row of activeBox.rows){
+				row.strokeweight = this.value()
+			}
+		}
+	}
+})
+
+//slider für textsize
+createDiv('textsize')
+	.parent(guiHolder)
+	.class('textnextto')
+textsizeslider = createSlider(1,500,10,1)
+	.parent(guiHolder)
+	.class('slider')
+textsizeslider.input(function(){
+	for(let box of boxes){
+		if(box.active){
+			for(let row of activeBox.rows){
+				row.textsize = this.value()
+			}
+		}
+	}
+})
+	
+//slider für row azahl
+createDiv('number of rows')
+		.parent(guiHolder)
+		.class('textnextto')
+	rowNumb = createSlider(1,20,5,1) //min, max, default, stepSize 
+		.parent(guiHolder) 
+		.class('slider')
+	rowNumb.input(function(){
+		for(let box of boxes){
+			if(box.active){ //adding rows till gewünschte anzhal
+				//if(box.active && box.rows.length < this.value()){
+
+				/*while(box.rows.length < this.value()){
+				box.rows.push({
+					color: color(0,224,79),
+   					amplitude: 20,
+   					waveType: 'mountain peaks',
+					label: "Wave"
+				})*/
+				
+				
+				let baseRow = box.rows[box.activeRow] //nimmt akutelle zeile als vorlage
+				// while=do it again and again till bedigung (aka slider value) is correct
+				while(box.rows.length < this.value()){
+				box.rows.push({
+					color: baseRow.color, //copy rows from active row
+   					amplitude: baseRow.amplitude,
+   					waveType: baseRow.waveType,
+					label: baseRow.label,
+					speed: baseRow.speed,
+					textsize: baseRow.textsize,
+					direction: baseRow.direction,
+					lengthrow: baseRow.lengthrow,
+					strokeweight: baseRow.strokeweight,
+					strokecolor: baseRow.strokecolor,
+					sizerow: baseRow.sizerow,
+				})
+			}
+			//rows entfernen wenn slider runter geht
+				while(box.rows.length > this.value()){ //die länge is value vom slider, rest wird abgeschnitten
+					box.rows.pop() //pop = remove last element form array
+				}
+				}
+
+		}
+	})
+
+	//slider für abstand rows
+createDiv('gab rows')
+	.parent(guiHolder)
+	.class('textnextto')
+sizerowslider = createSlider(1,300,50,1)
+	.parent(guiHolder)
+	.class('slider')
+sizerowslider.input(function(){
+	for(let box of boxes){
+		if(box.active){
+			for(let row of activeBox.rows){
+				row.sizerow = this.value()
+			}
+		}
+	}
+})
+
+//slider für length of row
+createDiv('length')
+	.parent(guiHolder)
+	.class('textnextto')
+lenghtrowslider = createSlider(1,3000,150,1)
+	.parent(guiHolder)
+	.class('slider')
+lenghtrowslider.input(function(){
+	for(let box of boxes){
+		if(box.active){
+			for(let row of activeBox.rows){
+				row.lengthrow = this.value()
+			}
+		}
+	}
+})
+
+//amplitude slider
+createDiv('amplitude')
+		.parent(guiHolder)
+		.class('textnextto')
+let sliderRow = createDiv()
+	.parent(guiHolder)
+	.class('sliderRow')
+
+	//slider für amplitude wave
+	amplitudeSlider = createSlider(1,100,20,1)
+		.parent(guiHolder)
+		.class('slider')
+	amplitudeSlider.input(function(){
+		for(let box of boxes){
+			if(box.active){
+				for(let row of activeBox.rows){
+					row.amplitude = this.value()
+				}
+			//activeBox.rows[activeBox.activeRow].amplitude = this.value()
+			//box.rows[box.activeRow].amplitude = this.value()
+			}
+		}
+	})
+
+//slider für speed
+createDiv('speed')
+	.parent(guiHolder)
+	.class('textnextto')
+speedSlider = createSlider(0,10,1,0.1)
+	.parent(guiHolder)
+	.class('slider')
+speedSlider.input(function(){
+	for(let box of boxes){
+		if(box.active){
+			for(let row of activeBox.rows){
+				row.speed = this.value()
+			}
+		}
+	}
+})
+
+//input direction
+createDiv('angle')
+		.parent(guiHolder)
+		.class('textnextto')
+
+InputDir = createInput("")
+	.parent(guiHolder)
+	.class('textnextto')
+InputDir.attribute("type", "number")
+	.parent(guiHolder)
+	.class('textInput')
+InputDir.input(function(){
+	for(let box of boxes){
+		if(box.active){
+			for(let row of activeBox.rows){
+				row.direction = this.value()
+			}
+		}
+	}
+})
+
+}
+
+
+function draw() {
+	background(0)
+
+	 angleMode(DEGREES)
+    motionX += speedSlider.value()
+    motionY += speedSlider.value()
+    let x = sin(motionX) * 100 // smooooother
+    // let x = sin(frameCount * speedSlider.value()) * 100
+
+	for(let box of boxes) {
+		box.display()
+		//box.label = txt
+	}
+
+}
+
+function mouseDragged(){
+	//code that mouse is not working behind gui
+	var ghpos = guiHolder.position()
+    var ghsize = guiHolder.size()
+    var border = 25
+    if((mouseX <= ghpos.x-border || mouseX >= ghpos.x + ghsize.width+border) || (mouseY <= ghpos.y-border || mouseY >= ghpos.y+ghsize.height+border)){
+     //you need to put all mouse happing stuff here so it doesnt go behind gui   
+		if(activeBox){
+			activeBox.x += movedX
+			activeBox.y += movedY
+		}
+	}
+}
+
+function mousePressed(){
+	//code that mouse is not working behind gui
+	var ghpos = guiHolder.position()
+    var ghsize = guiHolder.size()
+    var border = 25
+    if((mouseX <= ghpos.x-border || mouseX >= ghpos.x + ghsize.width+border) || (mouseY <= ghpos.y-border || mouseY >= ghpos.y+ghsize.height+border)){
+     //you need to put all mouse happing stuff here so it doesnt go behind gui   
+	 	let hitShape = false
+		activeBox = null // no box is selected/reset
+
+		for(let box of boxes) {
+			box.active = false
+		}
+		for(let box of boxes){
+				//rect(box.x, box.y, box.rows[0].lengthrow * 5 ,box.rows.length * box.sizerow)
+
+			 if(box.rows.length === 0) continue //if no box, überspringe box (damit ned crashed when deleting)
+		//rect(this.x, this.y, this.x + tw, this.y - row.textsize)
+	
+			//if(dist(mouseX, mouseY, box.x, box.y) < 50){ 
+			if(mouseX >= box.x 
+			&& mouseX <= box.x + box.tw
+			&& mouseY >= box.y - textAscent() //zeichen über baseline
+			&& mouseY <= box.y + textDescent()){  //zeichen unter baseline
+				box.active = true
+				hitShape = true
+				activeBox = box //damit box verändert werde cha aso die normal box isch jetzt aktiv box
+				print("HIIIIIIT")
+
+
+			 /*if(mouseX >= box.x 
+			//&& mouseX <= box.x + box.tw //x+w
+			&& mouseX <= box.x + box.tw + box.rows[0].lengthrow//x+w
+			&& mouseY >= box.y - box.rows[0].textsize
+			//&& mouseY <= box.y){  //y+h
+			&& mouseY <= box.y + (box.rows.length -1) * box.sizerow){  //y+h
+				box.active = true
+				hitShape = true
+				activeBox = box //damit box verändert werde cha aso die normal box isch jetzt aktiv box
+				print("HIIIIIIT")*/
+				
+
+			//sync gui
+			//activeBox = selected box, [activeRow] = aktive Zeile, take active box, go in row, take row and take value from it // go in obejkt, array, take objekt, take value
+			txt = activeBox.rows[activeBox.activeRow].label
+			textInputSlider.elt.value = activeBox.rows[activeBox.activeRow].label //elt takes HTML value
+			amplitudeSlider.value(activeBox.rows[activeBox.activeRow].amplitude)
+			colorPicker.value(activeBox.rows[activeBox.activeRow].color)
+			WavetypeSelect.value(activeBox.rows[activeBox.activeRow].waveType)
+			speedSlider.value(activeBox.rows[activeBox.activeRow].speed)
+			textsizeslider.value(activeBox.rows[activeBox.activeRow].textsize)
+			strokeWeightSlider.value(activeBox.rows[activeBox.activeRow].strokeweight)
+			colorPickerStroke.value(activeBox.rows[activeBox.activeRow].strokecolor)
+			lenghtrowslider.value(activeBox.rows[activeBox.activeRow].lengthrow)
+			rowNumb.value(activeBox.rows.length)//kei [] will isch ja ned uf einzelner zeile, also row weiss ned wie viel rows es höt, dass weiss nur die aktivi box selber
+			InputDir.value(activeBox.rows[activeBox.activeRow].direction)
+			sizerowslider.value(activeBox.rows[activeBox.activeRow].sizerow)
+			}
+		}
+
+	
+		/*if(!hitShape){ //if didn't hit
+			// grabtemp gui values and use below when building
+			// build temp TextBox(), set values also after building.. then push into boxes
+			//aso wie so leeri boxe mache 
+			//boxes.push(new TextBox(mouseX, mouseY, 350, 350, color1, 2, 'horizontal', 'sinus', 'Wave'))
+			let newBox =new TextBox(mouseX, mouseY, 350, 350, color1, 2, 'horizontal', 'sinus', 'Wave')
+
+			boxes.push(newBox) //safe in list
+			activeBox = newBox //select for gui
+		}*/
+	
+	}	
+}
+
+/*function keyPressed(e){
+	if(keyCode === 8 &&  e.target != "input"){ //delete key
+		//akutellle box, deren zeile, which row is active and then splice remove this row
+        //print(e)
+		if(activeBox && activeBox.hasOwnProperty("rows") && activeBox.rows.length > 0){
+			activeBox.rows.splice(activeBox.activeRow, 1)
+		}
+}*/
+
+
+function saveMyGif(){
+	saveGif("Wavetype-pattern", 60,{
+	units: "frames",
+	delay: 0
+	})
+}
+	/*if (key === "c") {
+    const capture = P5Capture.getInstance();
+    if (capture.state === "idle") {
+      capture.start();
+    } else {
+      capture.stop();
+    }
+  }*/
+
+
+
+/*function keyPressed(){
+	if(keyCode === 38){ //up arrow
+		box.activeRow++
+	}
+	if(keyCode === 40){ //down arrow
+		box.activeRow--
+	}
+	for(let box of boxes){
+		if(box.active){
+			box.activeRow = constrain(box.activeRow,0,box.rows.length-1) //damit man nicht eine reihe auswählen kann, die nicht exitiert und box.rows-1 nimmt automatisch die letze reihe
+		}
+	}
+}*/
+
+class TextBox {
+	constructor(x, y, w, h, col, speed, direction, animation, label) { //object wird "geboren" und alles was individuell beistzen rein
+		this.x = x
+		this.y = y
+		this.w = w
+		this.h = h
+		this.color = col
+		this.speed = speed
+		this.direction = direction
+		this.animation = animation
+		this.label = label
+		this.frameCount = 0
+		//this.loopcount = 150 //make this a variable on a slider  (for length)
+		
+		this.active = true
+		this.activeRow = 0
+		
+		this.myColor = color(168, 117, 255)
+		this.waveType = 'mountain peaks'
+		this.amplitude = 20
+		//this.rows = 5
+		this.rows = []
+
+	// *** listen to sliders here
+		for(let i = 0; i < 1; i++){ //box start with 1 row
+  			this.rows.push({
+    		color: color(168, 117, 255),
+   			amplitude: 20,
+   			waveType: 'mountain peaks',
+			label: "Wave",
+			speed: 2,
+			textsize: 40,
+			direction: 1,
+			lengthrow: 1,
+			strokeweight:1 ,
+			strokecolor: color(255,255,255),
+			sizerow: 50
+  			})
+		}
+		
+		
+		this.sizetext = 60
+		//this.sizerow = 55
+		this.sizecolumn = 270
+
+	}
+
+	display() {
+		//print(keyCode)
+		//textSize(this.textsize)
+		this.frameCount++
+	if(this.rows.length === 0) return //damit ned crashed wenn lösche
+		//stroke(0)
+		//strokeWeight(3)
+		/*if(this.active){
+			strokeWeight(2)
+			stroke(255,0,0)	
+		}*/
+
+		
+	
+		//fill(255)
+	//rectMode(CENTER)
+	//rect(box.x, box.y, box.x + box.rows, box.y + box.sizetext )
+	//rect(this.x, this.y, this.rows[0].lengthrow * 5 ,this.rows.length * this.sizerow)
+		
+		//zuesätzliche loop für y damit i chan reihe hinzuefüege aka row wird gmacht
+	for(let rep = 0; rep < this.rows.length; rep++) {
+
+		//for(let r = 0; r < this.rows.length; r++) {  // create rows/every row
+			//let row = this.rows[r] //safe current row
+				//let row = this.rows[this.activeRow]
+				let row = this.rows[rep] //aktuelle reihe
+												
+								textSize(row.textsize)
+								this.tw = textWidth(row.label)
+
+					for(let i = 0; i < row.lengthrow; i++) { //how i draw the rows horizontal, how often repetition of text
+								
+							let anglerad = radians(row.direction)
+								let xPos = this.x + (i-row.lengthrow)  * cos(anglerad) //- so goes in other direction
+								let yPos = this.y + (i-row.lengthrow)  * sin(anglerad)
+
+								let waveOffset = this.frameCount * row.speed //row.direction //seems it's going to the right
+
+								let yWave = Waves.wave(xPos + waveOffset, {
+									wave: row.waveType,
+									t:     millis() * 0.001 * row.speed, //+= 0.01
+									amplitude:  row.amplitude
+								})
+								
+								//print(xPos,yPos)
+								
+								
+								//rect(xPos, yPos, xPos + this.rows[0].lengthrow * 5 , yWave - this.rows.length * this.sizerow)
+								
+								//rect(this.x, this.y, this.rows[0].lengthrow * 5 ,this.rows.length * this.sizerow)
+								//rect(this.x, this.y, this.rows[0].lengthrow * 5, this.rows.length * this.sizerow)
+								//rect(this.x, this.y, this.x + this.rows[0].lengthrow * 5, this.y + this.rows.length * this.sizerow)
+								//rect(this.x, yPos,  this.x + this.x + i, yWave - this.rows.length * this.sizerow)
+								
+								//rect(this.x, this.y, this.x + this.tw, this.y - row.textsize)
+								textAlign(LEFT, BASELINE)
+								fill(row.color)
+								strokeWeight(row.strokeweight)
+								stroke(row.strokecolor)
+								text(row.label, //do wird row actually zeichnet
+									xPos,
+									yPos + yWave + rep * row.sizerow //rep and this.sizerow is needed for the adding rows
+						
+									//this.y+ yWave + r * this.sizerow
+								)
+							
+
+					}
+				} 
+		/*}*/
+		//rect(this.x, this.y, this.x + this.tw, this.y - this.rows[0].textsize)
+		push()
+		if(this.active){
+			noFill()
+			stroke(255,0,0)	
+			strokeWeight(3)
+			rectMode(CORNERS)
+			rect(this.x- this.rows[0].lengthrow,
+     		this.y - this.rows[0].textsize,
+    		this.x + this.tw,
+     		this.y + (this.rows.length - 1) * this.rows[0].sizerow)	
+			pop()
+		}	
+
+	}
+}
+
+</script>
+
+</body>
+</html>
